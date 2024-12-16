@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolo Bolletta Gas e Luce</title>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            margin: 0;
+            padding: 0;
+        }
+		
+		.icon {
+			cursor: pointer;
+			font-size: 20px;
+			color: #007BFF;
+			margin-left: 5px;
+		}
+
+		.icon:hover {
+			color: #0056b3;
+		}
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-around;
+            background-color: #6c63ff;
+            padding: 15px 0;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            margin: 50px auto;
+            padding: 30px;
+            max-width: 500px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+		
+		label {
+            display: block;
+            margin-top: 10px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #5549c3;
+        }
+
+        .result {
+            margin-top: 20px;
+            text-align: left;
+            color: #28a745;
+        }
+
+        .error {
+            color: red;
+        }
+		
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.5);
+		}
+		
+		
+		.modal-content {
+			background-color: #fff;
+			margin: 15% auto;
+			padding: 20px;
+			border: 1px solid #888;
+			width: 80%;
+			max-width: 600px;
+		}
+
+		.close {
+			color: #aaa;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: black;
+			text-decoration: none;
+			cursor: pointer;
+		}
+		
+    </style>
+	
+	
+
+	
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="#gas" onclick="showSection('gas')">Calcolo Gas</a>
+        <a href="#luce" onclick="showSection('luce')">Calcolo Luce</a>
+    </div>
+	
+	<!-- Modal gas -->
+	<div id="modal-gas" class="modal">
+		<div class="modal-content">
+			<span id="close-gas" class="close">&times;</span>
+			<img src="https://i.imgur.com/b0mKu1S.jpeg" alt="Informazioni Gas" width="100%">
+		</div>
+	</div>
+	
+	<!-- Modal luce -->
+	<div id="modal-luce" class="modal">
+		<div class="modal-content">
+			<span id="close-luce" class="close">&times;</span>
+			<img src="https://i.imgur.com/gXqgHV8.jpeg" alt="Informazioni Luce" width="100%">
+		</div>
+	</div>
+
+    <!-- Sezione Gas -->
+    <div id="gas" class="container">
+        <h1>Calcolo Bolletta Gas</h1>
+            <label for="totaleGas">Totale Bolletta Gas (€):</label>
+            <input type="number" step="0.01" id="totaleGas" placeholder="Es: 120.50" required>
+
+            <label for="smcGas">Consumo Totale Gas (SMC): <span class="icon" id="infoIcon-gas"><i class="fas fa-question-circle"></i></span> </label>
+            <input type="number" step="0.01" id="smcGas" placeholder="Es: 100.5" required>
+
+            <label for="mese1_gas">Partecipanti 1° mese (numeri o nomi):</label>
+            <input type="text" id="mese1_gas" placeholder="Es: Alice, Giovanni oppure 3" required>
+
+            <label for="mese2_gas">Partecipanti 2° mese (numeri o nomi):</label>
+            <input type="text" id="mese2_gas" placeholder="Es: Alice, Sharon oppure 2" required>
+
+            <button type="button" onclick="calcolaBollettaGas()">Calcola</button>
+
+        <div id="risultatoGas" class="result" style="display:none;"></div>
+    </div>
+
+    <!-- Sezione Luce -->	
+	<div id="luce" class="container" style="display:none;">
+        <h1>Calcolo Bolletta Luce</h1>
+            <label for="totaleLuce">Totale Bolletta Luce (€):</label>
+            <input type="number" step="0.01" id="totaleLuce" placeholder="Es: 150.75" required>
+
+            <label for="consumoLuce">Consumo Totale Luce (kWh): <span class="icon" id="infoIcon-luce"><i class="fas fa-question-circle"></i></span> </label>
+            <input type="number" step="0.01" id="consumoLuce" placeholder="Es: 4" required>
+
+
+            <label for="mese1_luce">Partecipanti 1° mese (numeri o nomi):</label>
+            <input type="text" id="mese1_luce" placeholder="Es: Alice, Giovanni oppure 3" required>
+
+            <label for="mese2_luce">Partecipanti 2° mese (numeri o nomi):</label>
+            <input type="text" id="mese2_luce" placeholder="Es: Luca, Maria oppure 2" required>
+
+            <button type="button" onclick="calcolaBollettaLuce()">Calcola</button>
+
+        <div id="risultatoLuce" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+// Funzione per mostrare una sezione alla volta
+function showSection(section) {
+    document.getElementById('gas').style.display = section === 'gas' ? 'block' : 'none';
+    document.getElementById('luce').style.display = section === 'luce' ? 'block' : 'none';
+}
+
+// Funzione per il calcolo della Bolletta Gas
+function calcolaBollettaGas() {
+    const totaleBollettaGas = parseFloat(document.getElementById('totaleGas').value);
+    const smcGas = parseFloat(document.getElementById('smcGas').value);
+    const inputSettembreGas = document.getElementById('mese1_gas').value;
+    const inputOttobreGas = document.getElementById('mese2_gas').value;
+
+    if (isNaN(totaleBollettaGas) || isNaN(smcGas) || totaleBollettaGas <= 0 || smcGas <= 0) {
+        alert("Inserisci valori validi per bolletta e SMC.");
+        return;
+    }
+
+    const risultatoDivGas = document.getElementById('risultatoGas');
+    risultatoDivGas.innerHTML = `<h3>Riepilogo Costi Gas (SMC: ${smcGas}):</h3>`;
+
+    const partecipantiSettembreGas = interpretaInput(inputSettembreGas);
+    const partecipantiOttobreGas = interpretaInput(inputOttobreGas);
+
+    const costoPerSmcGas = totaleBollettaGas / smcGas;
+    const consumoMensileGas = smcGas / 2;
+
+    const consumoPersonaSettembreGas = consumoMensileGas / partecipantiSettembreGas;
+    const consumoPersonaOttobreGas = consumoMensileGas / partecipantiOttobreGas;
+
+    const costoSettembreGas = consumoPersonaSettembreGas * costoPerSmcGas;
+    const costoOttobreGas = consumoPersonaOttobreGas * costoPerSmcGas;
+	
+	if (typeof partecipantiSettembreGas === "number" && typeof partecipantiOttobreGas === "number") {
+	
+		if (partecipantiSettembreGas === partecipantiOttobreGas) {
+			const totaleGas = totaleBollettaGas / partecipantiSettembreGas;
+			risultatoDivGas.innerHTML += `<p><strong>Costo per ciascuno:</strong> ${totaleGas.toFixed(2)} €</p>`;
+		} else {
+			risultatoDivGas.innerHTML += `<p><strong>1° Mese:</strong> ${partecipantiSettembreGas} persone, €${costoSettembreGas.toFixed(2)}</p>`;
+			risultatoDivGas.innerHTML += `<p><strong>2° Mese:</strong> ${partecipantiOttobreGas} persone, €${costoOttobreGas.toFixed(2)}</p>`;
+		}
+	} else {
+	
+		const totalePerPartecipante = {};
+        calcolaCosti(partecipantiSettembreGas, totaleBollettaGas / 2, totalePerPartecipante);
+        calcolaCosti(partecipantiOttobreGas, totaleBollettaGas / 2, totalePerPartecipante);
+
+        for (const [persona, totale] of Object.entries(totalePerPartecipante)) {
+			const nomeVisualizzato = persona.charAt(0).toUpperCase() + persona.slice(1);
+			const paragrafo = document.createElement('p');
+			paragrafo.textContent = `${nomeVisualizzato}: €${totale.toFixed(2)}`;
+			risultatoDivGas.appendChild(paragrafo);
+        }
+	
+	}
+	
+	
+	
+    risultatoDivGas.style.display = 'block';
+}
+
+// Funzione per il calcolo della Bolletta Luce
+function calcolaBollettaLuce() {
+    const totaleBollettaLuce = parseFloat(document.getElementById('totaleLuce').value);
+    const consumoLuce = parseFloat(document.getElementById('consumoLuce').value);
+
+    const consumoSettembreLuce = consumoLuce / 2;
+    const consumoOttobreLuce = consumoLuce / 2;
+
+    const inputSettembreLuce = document.getElementById('mese1_luce').value;
+    const inputOttobreLuce = document.getElementById('mese2_luce').value;
+
+    if (isNaN(totaleBollettaLuce) || isNaN(consumoLuce) || totaleBollettaLuce <= 0 || consumoLuce <= 0) {
+        alert("Inserisci valori validi per bolletta e Kwh.");
+        return;
+    }
+
+    const risultatoDivLuce = document.getElementById('risultatoLuce');
+    risultatoDivLuce.innerHTML = `<h3>Riepilogo Costi Luce (Totale: €${totaleBollettaLuce}):</h3>`;
+
+    const partecipantiSettembreLuce = interpretaInput(inputSettembreLuce);
+    const partecipantiOttobreLuce = interpretaInput(inputOttobreLuce);
+
+    const costoPerKwhLuce = totaleBollettaLuce / (consumoSettembreLuce + consumoOttobreLuce);
+
+    const consumoPersonaSettembreLuce = consumoSettembreLuce / partecipantiSettembreLuce;
+    const consumoPersonaOttobreLuce = consumoOttobreLuce / partecipantiOttobreLuce;
+
+    const costoSettembreLuce = consumoPersonaSettembreLuce * costoPerKwhLuce;
+    const costoOttobreLuce = consumoPersonaOttobreLuce * costoPerKwhLuce;
+
+	if (typeof partecipantiSettembreLuce === "number" && typeof partecipantiOttobreLuce === "number") {
+
+
+		if (partecipantiSettembreLuce === partecipantiOttobreLuce) {
+			const totaleLuce = totaleBollettaLuce / partecipantiSettembreLuce;
+			risultatoDivLuce.innerHTML += `<p><strong>Costo per ciascuno:</strong> ${totaleLuce.toFixed(2)} €</p>`;
+		} else {
+			risultatoDivLuce.innerHTML += `<p><strong>Settembre:</strong> ${partecipantiSettembreLuce} persone, €${costoSettembreLuce.toFixed(2)}</p>`;
+			risultatoDivLuce.innerHTML += `<p><strong>Ottobre:</strong> ${partecipantiOttobreLuce} persone, €${costoOttobreLuce.toFixed(2)}</p>`;
+		}
+	
+	} else {
+	
+		const totalePerPartecipante = {};
+        calcolaCosti(partecipantiSettembreLuce, totaleBollettaLuce / 2, totalePerPartecipante);
+        calcolaCosti(partecipantiOttobreLuce, totaleBollettaLuce / 2, totalePerPartecipante);
+
+        for (const [persona, totale] of Object.entries(totalePerPartecipante)) {
+			const nomeVisualizzato = persona.charAt(0).toUpperCase() + persona.slice(1);
+			const paragrafo = document.createElement('p');
+			paragrafo.textContent = `${nomeVisualizzato}: €${totale.toFixed(2)}`;
+			risultatoDivLuce.appendChild(paragrafo);
+        }	
+	
+	
+	}
+	
+	
+    risultatoDivLuce.style.display = 'block';
+}
+
+// Interpreta l'input come numeri o nomi
+function interpretaInput(input) {
+    if (!isNaN(input)) {
+        return parseInt(input);  // Ritorna il numero di persone
+    }
+    return input.split(',').map(nome => nome.trim());
+}
+
+// Calcola i costi pro capite
+function calcolaCosti(partecipanti, costoTotale, totalePerPartecipante) {
+    const costoPerPersona = costoTotale / partecipanti.length;
+    partecipanti.forEach(persona => {
+		const nomeNormalizzato = persona.toLowerCase();
+
+        totalePerPartecipante[nomeNormalizzato] = (totalePerPartecipante[nomeNormalizzato] || 0) + costoPerPersona;
+    });
+}
+
+    </script>
+	
+	  <script>
+// Funzione per aprire la modale specifica
+function openModal(modalId) {
+  var modal = document.getElementById(modalId);
+  modal.style.display = "block";
+}
+
+// Funzione per chiudere la modale
+function closeModal(modalId) {
+  var modal = document.getElementById(modalId);
+  modal.style.display = "none";
+}
+
+// Eventi per Gas
+var iconGas = document.getElementById("infoIcon-gas");
+iconGas.onclick = function() {
+  openModal('modal-gas');
+}
+
+var closeGas = document.getElementById("close-gas");
+closeGas.onclick = function() {
+  closeModal('modal-gas');
+}
+
+window.onclick = function(event) {
+  if (event.target == document.getElementById('modal-gas')) {
+    closeModal('modal-gas');
+  }
+}
+
+// Eventi per Luce
+var iconLuce = document.getElementById("infoIcon-luce");
+iconLuce.onclick = function() {
+  openModal('modal-luce');
+}
+
+var closeLuce = document.getElementById("close-luce");
+closeLuce.onclick = function() {
+  closeModal('modal-luce');
+}
+
+window.onclick = function(event) {
+  if (event.target == document.getElementById('modal-luce')) {
+    closeModal('modal-luce');
+  }
+}
+
+  </script>
+</body>
+</html>
